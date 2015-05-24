@@ -5,6 +5,7 @@ var
   parser $ require :cirru-parser
   indent $ require :../util/indent
   demo $ require :../demo.cr
+  Tree $ React.createFactory $ require :./tree
 
 var
   div $ React.createFactory :div
@@ -46,4 +47,4 @@ var
           :onChange this.onChange
           :onKeyDown this.onKeyDown
       div (object (:className :monitor))
-        JSON.stringify this.state.ast
+        Tree $ object (:ast this.state.ast)
