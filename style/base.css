@@ -1,0 +1,12 @@
+
+body, textarea {
+  font-size: 14px;
+  line-height: 1.6em;
+  font-family: Ubuntu mono, monospace;
+}
+
+textarea {
+    border: none;
+    resize: none;
+    outline: none;
+}
