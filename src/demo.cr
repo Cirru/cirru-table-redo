@@ -1,4 +1,10 @@
 
-set a 1
+define a $ + 1 2
 
-print a
+define add $ \ (x y)
+  suppose
+    x 1
+    y 2
+  + x y
+
+print $ add 1 2
