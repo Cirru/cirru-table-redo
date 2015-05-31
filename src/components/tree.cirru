@@ -16,5 +16,5 @@ var T React.PropTypes
 
   :render $ \ ()
     return $ div (object (:className :app-tree))
-      this.props.ast.map $ \\ (node)
-        return $ Expr (object (:expr node))
+      this.props.ast.map $ \\ (node index)
+        return $ Expr (object (:expr node) (:key index))
