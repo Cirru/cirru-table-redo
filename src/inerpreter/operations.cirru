@@ -33,7 +33,11 @@ var readExpr $ \ (scope expr)
     return $ buitlinFunc scope args
   var func $ scope.get head
   if (? func) $ do
-    return $ func scope args
+    if (is (type func.value) :function)
+      do
+        return $ func.value scope args
+      do
+        return $ object (:scope scope) (:value null) (:errored true)
   return $ object (:scope scope) (:value null) (:errored true)
 
 var mapArgs $ \ (scope start args)
@@ -43,27 +47,40 @@ var mapArgs $ \ (scope start args)
   var rest $ args.rest
   var result $ readExpr scope head
   var newStart $ start.concat $ array
-    start
+    readExpr scope start
   return $ mapArgs scope newStart rest
 
-var reduce $ \ (scope state args method)
+var reduceArgs $ \ (scope start args method)
+  if (is args.size 0) $ do
+    return $ object (:scope scope) (:value start) (:errored false)
   var head $ args.first
   if head.errored $ do
     return $ object (:scope scope) (:value null) (:errored true)
-  if (is args.size 0)
-
-  var newStart $ method start
+  var newStart $ method start head.value
+  return $ object (:scope scope) (:value newStart) (:errored false)
 
 = builtins $ object
-  :define $ (scope args)
-    var value b
-    return $ object
-      :errored false
-      :scope scope.set a b
-      :result b
+  :define $ \ (contextScope params)
+    var contextArgs $ params.first
+    if (not $ ? contextArgs) $ do
+      return $ object (:scope scope) (:value null) (:errored false)
+    var contextBody $ params.rest
+    return $ object (:errored false) (:scope contextScope)
+      :value $ \ (scope args)
+        contextArgs.forEach $ \ (alias index)
+          if (is (type alias) :string)
+            do
+              = scope $ scope.set alias $ scope.get (args.get index)
+        var ret $ object (:scope scope) (:value null) (:errored false)
+        contextBody.forEach $ \ (statement index)
+          var ret $ readExpr ret.scope statement
+          if ret.errored $ do $ return false
+        return ret
 
   :add $ \ (scope args)
-    var head $ args.first
-    var rest $ args.rest
+    return $ reduceArgs scope 0 args $ \ (a b)
+      return $ + a b
 
-    return $ + a b
+  :minus $ \ (scope args)
+    return $ reduceArgs scope 0 args $ \ (a b)
+      return $ - a b
