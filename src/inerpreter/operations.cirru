@@ -3,7 +3,7 @@ var
   type $ require :type
   immutable $ require :immutable
 
-var readToken $ \ (scope errored expr)
+var readToken $ \ (scope expr)
   var firstChar $ expr.slice 0 1
   var laterContent $ expr.slice 1
   -- "try string"
@@ -46,11 +46,13 @@ var mapArgs $ \ (scope start args)
   var head $ args.first
   var rest $ args.rest
   var result $ readExpr scope head
-  var newStart $ start.concat $ array
-    readExpr scope start
-  return $ mapArgs scope newStart rest
+  var newStart $ start.concat $ array result
+  return $ mapArgs result.scope newStart rest
 
 var reduceArgs $ \ (scope start args method)
+  if (not (? start))  $ do
+    var newStart $ head.first
+    return $ reduceArgs newStart args.rest method
   if (is args.size 0) $ do
     return $ object (:scope scope) (:value start) (:errored false)
   var head $ args.first
