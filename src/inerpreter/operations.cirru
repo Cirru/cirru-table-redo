@@ -8,19 +8,19 @@ var readToken $ \ (scope expr)
   var laterContent $ expr.slice 1
   -- "try string"
   if (is firstChar ::) $ do
-    return $ object (:scope scope) (:value laterContent) (:errored false)
+    return laterContent
   -- "try bool"
   if (is expr :true) $ do
-    return $ object (:scope scope) (:value true) (:errored false)
+    return true
   if (is expr :false) $ do
-    return $ object (:scope scope) (:value false) (:errored false)
+    return false
   if (expr.match "/-?\\d+(\\.\\d+)?") $ do
-    return $ object (:scope scope) (:value (Number expr)) (:errored false)
+    return (Number expr)
   -- "try alias"
   if (firstChar.match /\w) $ do
-    return $ object (:scope scope) (:value (scope.get expr)) (:errored false)
+    return (scope.get expr)
   -- "return error"
-  result $ object (:scope scope) (:value null) (:errored true)
+  throw $ new Error $ + ":can not parse " expr
 
 var readExpr $ \ (scope expr)
   if (is (type expr) :string) $ do
@@ -37,35 +37,14 @@ var readExpr $ \ (scope expr)
       do
         return $ func.value scope args
       do
-        return $ object (:scope scope) (:value null) (:errored true)
-  return $ object (:scope scope) (:value null) (:errored true)
-
-var mapArgs $ \ (scope start args)
-  if (is args.size 0) $ do
-    return $ object (:scope scope) (:value start) (:errored false)
-  var head $ args.first
-  var rest $ args.rest
-  var result $ readExpr scope head
-  var newStart $ start.concat $ array result
-  return $ mapArgs result.scope newStart rest
-
-var reduceArgs $ \ (scope start args method)
-  if (not (? start))  $ do
-    var newStart $ head.first
-    return $ reduceArgs newStart args.rest method
-  if (is args.size 0) $ do
-    return $ object (:scope scope) (:value start) (:errored false)
-  var head $ args.first
-  if head.errored $ do
-    return $ object (:scope scope) (:value null) (:errored true)
-  var newStart $ method start head.value
-  return $ object (:scope scope) (:value newStart) (:errored false)
+        throw $ new Error $ + ":can not run expr" (JSON.stringify expr)
+  throw $ new Error $ + ":can not run expr" (JSON.stringify expr)
 
 = builtins $ object
   :define $ \ (contextScope params)
     var contextArgs $ params.first
     if (not $ ? contextArgs) $ do
-      return $ object (:scope scope) (:value null) (:errored false)
+      throw $ new Error ":not contextArgs"
     var contextBody $ params.rest
     return $ object (:errored false) (:scope contextScope)
       :value $ \ (scope args)
@@ -80,9 +59,11 @@ var reduceArgs $ \ (scope start args method)
         return ret
 
   :add $ \ (scope args)
-    return $ reduceArgs scope 0 args $ \ (a b)
-      return $ + a b
+    return $ ... args
+      map $ \ (item) $ return $ readExpr scope item
+      reduce $ \ (a b) $ return $ + a b
 
   :minus $ \ (scope args)
-    return $ reduceArgs scope 0 args $ \ (a b)
-      return $ - a b
+    return $ ... args
+      map $ \ (item) $ return $ readExpr scope item
+      reduce $ \ (a b) $ return $ - a b
