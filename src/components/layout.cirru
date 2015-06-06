@@ -5,6 +5,9 @@ var
   parser $ require :cirru-parser
   indent $ require :../util/indent
   demo $ require :../demo.cr
+  interpreter $ require :../interpreter
+
+var
   Tree $ React.createFactory $ require :./tree
 
 var
@@ -15,8 +18,8 @@ var
   :displayName :app-layout
 
   :getInitialState $ \ ()
-    console.log demo
     var ast $ parser.pare demo
+    = window.scope $ interpreter.load ast
     return $ object
       :code demo
       :ast ast

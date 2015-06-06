@@ -1,10 +1,9 @@
 
-define a $ + 1 2
+suppose (guess 1 2)
+define (guess x y)
+  bind 10 $ \ (size)
+    bind 20 $ \ (weight)
+      + (* x size) (* y weight)
 
-define add $ \ (x y)
-  suppose
-    x 1
-    y 2
-  + x y
-
-print $ add 1 2
+define (main)
+  print $ guess 1 2
