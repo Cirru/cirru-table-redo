@@ -7,6 +7,7 @@ var
 = module.exports $ object
   :entry $ object
     :main $ array :./src/main
+    :vendor $ array :react :keycode :cirru-parser :lodash
 
   :output $ object
     :path :build/

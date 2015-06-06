@@ -6,6 +6,7 @@ var
   env $ object
     :dev true
     :main :http://localhost:8080/build/main.js
+    :vendor :http://localhost:8080/build/vendor.js
 
 gulp.task :rsync $ \ (cb)
   var
@@ -42,6 +43,7 @@ gulp.task :html $ \ (cb)
   if (not env.dev) $ do
     = assets $ require :./build/assets.json
     = env.main $ + :./build/ assets.main
+    = env.vendor $ + :./build/ assets.vendor
   fs.writeFile :index.html (html env) cb
 
 gulp.task :del $ \ (cb)

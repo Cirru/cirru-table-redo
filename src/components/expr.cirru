@@ -1,7 +1,7 @@
 
 var
   React $ require :react
-  type $ require :component-type
+  _ $ require :lodash
   Token $ React.createFactory $ require :./token
 
 var
@@ -18,8 +18,7 @@ var Expr $ React.createClass $ object
   :render $ \ ()
     return $ div (object (:className :app-expr))
       this.props.expr.map $ \\ (node index)
-        return $ cond
-          is (type node) :array
+        return $ cond (_.isArray node)
           React.createElement Expr $ object (:expr node)
             :key index
           Token $ object (:token node) (:key index)

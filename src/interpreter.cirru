@@ -10,26 +10,28 @@ var readToken $ \ (scope expr)
   if (is expr :true) $ do $ return true
   if (is expr :false) $ do $ return false
   if (expr.match "/-?\\d+(\\.\\d+)?") $ do $ return (Number expr)
-  if (firstChar.match /\w) $ do $ return (scope.get expr)
+  if (firstChar.match /\w) $ do $ return (. scope expr)
   throw $ new Error $ + ":can not parse " expr
 
 var readExpr $ \ (scope expr)
   if (_.isString expr) $ do
-    return $ readToken scope expr
+    var result $ readToken scope expr
+    return result
 
   var
     head $ _.first expr
-    args $ _.rest args
-    buitlinFunc $ . builtins head
+    args $ _.rest expr
+
+  var buitlinFunc $ . builtins head
   if (? buitlinFunc) $ do
     return $ buitlinFunc scope args
+
+  var params $ args.map $ \ (item)
+    return $ readExpr scope item
   var func $ . scope head
   if (? func) $ do
-    if (_.isFunction func.value)
-      do
-        return $ func.value scope args
-      do
-        throw $ new Error $ + ":can not run expr" (JSON.stringify expr)
+    return $ func params
+
   throw $ new Error $ + ":can not run expr" (JSON.stringify expr)
 
 var builtins $ object
@@ -38,12 +40,12 @@ var builtins $ object
     var funcName $ _.first callExpr
     var params $ _.rest callExpr
     var expression $ . args 1
-    var func $ \ (inScope passedIn)
+    var func $ \ (passedIn)
       var newPairs $ object
       params.forEach $ \ (alias index)
-        = (. newPairs alias) (. inScope (. passedIn index))
+        = (. newPairs alias) (. passedIn index)
       var newScope $ _.assign (object) scope newPairs
-      return $ readExpr scope statement
+      return $ readExpr newScope expression
     = (. scope funcName) func
 
   :+ $ \ (scope args)
@@ -56,21 +58,39 @@ var builtins $ object
       map $ \ (item) $ return $ readExpr scope item
       reduce $ \ (a b) $ return $ - a b
 
+  :* $ \ (scope args)
+    return $ ... args
+      map $ \ (item) $ return $ readExpr scope item
+      reduce $ \ (a b) $ return $ * a b
+
+  :print $ \ (scope args)
+    var results $ args.map $ \ (expr)
+      return $ readExpr scope expr
+    console.log (... results)
+    return undefined
+
   :\ $ \ (scope args)
     var params $ _.first args
     var expression $ . args 1
-    return $ \ (inScope (passedIn))
+    return $ \ ((passedIn))
       var newPairs $ object
       params.forEach $ \ (alias index)
-        = (. newPairs alias) (. inScope (. passedIn index))
+        = (. newPairs alias) (. passedIn index)
       var newScope $ _.assign (object) scope newPairs
       return $ readExpr newScope expression
 
   :suppose $ \ (scope args)
     console.log :suppose args
 
+  :bind $ \ (scope args)
+    var value $ readExpr scope (_.first args)
+    var func $ readExpr scope (. args 1)
+    return $ func value
+
 = exports.load $ \ (program)
   var scope $ object
   program.forEach $ \ (line)
     readExpr scope line
   return scope
+
+= exports.builtins builtins
