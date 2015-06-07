@@ -14,10 +14,10 @@ gulp.task :rsync $ \ (cb)
   wrapper.rsync
     object
       :ssh true
-      :src $ array :index.html :build
+      :src $ array :index.html :build :style
       :recursive true
       :args $ array :--verbose
-      :dest :tiye:~/repo/cirru-table-redo/
+      :dest :tiye:~/repo/cirru/table-redo/
       :deleteAll true
     \ (error stdout stderr cmd)
       if (? error)
@@ -53,7 +53,7 @@ gulp.task :del $ \ (cb)
 
 gulp.task :webpack $ \ (cb)
   var
-    command $ cond env.dev :webpack ":webpack --config webpack.min.cirru"
+    command $ cond env.dev :webpack ":webpack --config webpack.min.cirru --progress"
   exec command $ \ (err stdout stderr)
     console.log stdout
     console.log stderr

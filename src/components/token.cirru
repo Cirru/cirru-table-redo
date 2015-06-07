@@ -12,7 +12,9 @@ var T React.PropTypes
 
   :propTypes $ object
     :token T.string.isRequired
+    :value T.any
 
   :render $ \ ()
     return $ div (object (:className :app-token))
       , this.props.token
+      , this.props.value

@@ -1,8 +1,17 @@
 
-Cirru Table Redo
+Cirru Table Redo(Failed)
 ----
 
-Exploring live-coding with Cirru.
+Exploring live-coding with Cirru. http://repo.cirru.org/table-redo/
+
+### Failed
+
+Why?
+
+* Functions is so abstract that I can visualize them.
+* It's not easy to interpreter with DOM elements, I'm not capable of that.
+
+More: http://segmentfault.com/a/1190000002882642
 
 ### Usage
 
