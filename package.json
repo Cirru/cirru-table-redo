@@ -29,7 +29,7 @@
     "cirru-parser": "^0.10.2",
     "keycode": "^2.1.0",
     "lodash": "^4.17.19",
-    "react": "^0.13.3"
+    "react": "^16.13.1"
   },
   "repository": {
     "type": "git",
